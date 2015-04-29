@@ -1,10 +1,9 @@
-// loads the prelude (?)
 #include "share/atspre_staload.hats"
 
 #define BOLD "\033[1m"
 #define NO_BOLD "\033[22m"
 
-#define HASH_TABLE_SIZE 1024
+#define HASH_TABLE_SIZE 256
 
 #define NORTH 0
 #define EAST 1
@@ -408,8 +407,6 @@ let
 
   val () = set_exit(platform1, platform2, South)
   val () = set_exit(platform2, platform1, North)
-
-  val () = print_hash_tables()
 
   var player: Player = spawn_player("You", platform1)
 
