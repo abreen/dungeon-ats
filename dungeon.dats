@@ -70,18 +70,6 @@ typedef Item = @{
 
 
 (*********************************************************
- * Hash tables for storing space graph
- *********************************************************)
-(*
-local
-  typedef key = string and itm = string
-in
-  #include "libats/ML/HATS/myhashtblref.hats"
-end
-*)
-
-
-(*********************************************************
  * Printing representations of data structures
  *********************************************************)
 fun print_dir (dir: Direction): void =
