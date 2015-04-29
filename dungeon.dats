@@ -4,6 +4,7 @@
 #define NO_BOLD "\033[22m"
 
 #define HASH_TABLE_SIZE 256
+#define DEFAULT_UNIVERSE_PATH "default.universe"
 
 #define NORTH 0
 #define EAST 1
@@ -303,7 +304,7 @@ let
     hashtbl_make_nil<string, Space>(i2sz(HASH_TABLE_SIZE))
 
   // for debugging
-  fun print_hash_tables(): void =
+  fun print_hash_tables (): void =
     begin
       print("to_north: ");
       fprint_hashtbl(stdout_ref, to_north);
@@ -316,7 +317,7 @@ let
       println!()
     end
 
-  fun create_room(id: string, name: string, desc: string): Space =
+  fun create_room (id: string, name: string, desc: string): Space =
     let
       val room = Room(id, name, desc)
       val _ = hashtbl_insert_any(spaces, id, room)
@@ -333,16 +334,10 @@ let
       | ~Some_vt (sp) => sp
     end
 
-  fun set_exit (from: Space, to: Space, dir: Direction): void =
+  fun set_exit_id (from: Space, to_id: string, dir: Direction): void =
     let
       val from_id = (
         case from of
-        | Room (id, _, _) => id
-        | Door (id, _, _, _) => id
-        | Empty () => ""
-      )
-      val to_id = (
-        case to of
         | Room (id, _, _) => id
         | Door (id, _, _, _) => id
         | Empty () => ""
@@ -363,7 +358,19 @@ let
         hashtbl_insert_any(table, from_id, to_id)
     end
 
-  fun get_exits(space: Space): list(Space, 4) =
+  fun set_exit (from: Space, to: Space, dir: Direction): void =
+    let
+      val to_id = (
+        case to of
+        | Room (id, _, _) => id
+        | Door (id, _, _, _) => id
+        | Empty () => ""
+      )
+    in
+      set_exit_id(from, to_id, dir)
+    end
+
+  fun get_exits (space: Space): list(Space, 4) =
     let
       val id = (
         case space of
@@ -390,13 +397,58 @@ let
         cons(north, cons(east, cons(south, cons(west, nil()))))
     end
 
-  var platform1 = create_room("p1", "Train platform", "An empty platform.")
-  var platform2 = create_room("p2", "Turnstiles", "Inoperative turnstiles.")
+  fun open_universe (path: string): void =
+    let
+      val file: FILEref = fileref_open_exn(path, file_mode_r)
+      fun read_space (): void =
+        let
+          val id = strptr2string(fileref_get_line_string(file))
 
-  val () = set_exit(platform1, platform2, South)
-  val () = set_exit(platform2, platform1, North)
+          val north_exit = strptr2string(fileref_get_line_string(file))
+          val east_exit = strptr2string(fileref_get_line_string(file))
+          val south_exit = strptr2string(fileref_get_line_string(file))
+          val west_exit = strptr2string(fileref_get_line_string(file))
 
-  var player: Player = spawn_player("You", platform1)
+          val name = strptr2string(fileref_get_line_string(file))
+          val desc = strptr2string(fileref_get_line_string(file))
+
+          val room = create_room(id, name, desc)
+        in
+          if eq_string_string(id, "") then ()
+          else begin
+            (
+              case north_exit of
+              | "~" => ()
+              | exit_id => set_exit_id(room, exit_id, North)
+            );
+            (
+              case east_exit of
+              | "~" => ()
+              | exit_id => set_exit_id(room, exit_id, East)
+            );
+            (
+              case south_exit of
+              | "~" => ()
+              | exit_id => set_exit_id(room, exit_id, South)
+            );
+            (
+              case west_exit of
+              | "~" => ()
+              | exit_id => set_exit_id(room, exit_id, West)
+            );
+            if fileref_isnot_eof(file) then
+              read_space()      // read another one
+            else ()
+          end
+        end
+
+    in (read_space(); fileref_close(file))
+    end
+
+  val () = open_universe(DEFAULT_UNIVERSE_PATH)
+  val spawn_space = get_space_by_id("spawn")
+
+  var player: Player = spawn_player("You", spawn_space)
 
   val () = describe(player.location)
 
