@@ -26,6 +26,10 @@ The fields must be in the following order:
 Thus every `.universe` file must have a number of lines that is
 a multiple of seven.
 
+Important note: `dungeon-ats` expects that one space have the
+id `spawn`, which is the space that the player will start the game
+in.
+
 
 [dun]: https://github.com/abreen/Dungeon
 [ats]: http://www.ats-lang.org
