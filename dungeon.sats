@@ -1,6 +1,8 @@
 #define BOLD "\033[1m"
 #define NO_BOLD "\033[22m"
 
+#define DEFAULT_UNIVERSE_PATH "default.universe"
+
 #define NORTH 0
 #define EAST 1
 #define SOUTH 2

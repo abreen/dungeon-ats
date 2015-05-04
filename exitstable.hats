@@ -58,6 +58,24 @@ fun create_room (id: string, name: string, desc: string): Space =
   end
 
 (*
+ * Creates a new door with no connections to rooms and adds it to
+ * the hash table.
+ * TODO
+ *)
+fun create_door (
+  id: string,
+  name: string,
+  desc: string,
+  key: int
+): Space =
+  let
+    val door = Door(id, name, desc, @{secret=key, description=""})
+    val _ = hashtbl_insert_any(spaces, id, door)
+  in
+    door
+  end
+
+(*
  * Given an ID, returns a space with the ID, or Empty if there is
  * no space with that ID.
  *)

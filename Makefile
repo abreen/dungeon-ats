@@ -7,16 +7,10 @@ LDFLAGS=-L$(PATSHOME)/ccomp/atslib/lib -latslib
 dungeon: dungeon.sats dungeon.dats
 	$(PATSCC) $(PATSCCFLAGS) -o $@ $^ $(LDFLAGS)
 
-#dungeon_dats.o: dungeon.dats
-#	$(PATSCC) $(PATSCCFLAGS) -c $<
-#
-#dungeon_sats.o: dungeon.sats
-#	$(PATSCC) $(PATSCCFLAGS) -c $<
-
-%_sats.o: %.sats
+dungeon_dats.o: dungeon.dats
 	$(PATSCC) $(PATSCCFLAGS) -c $<
-
-%_dats.o: %.dats
+#
+dungeon_sats.o: dungeon.sats
 	$(PATSCC) $(PATSCCFLAGS) -c $<
 
 clean:
